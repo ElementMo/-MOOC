@@ -7,8 +7,8 @@ TEST_INRERVAL_SECS = 5
 
 def test(mnist=None):
     with tf.Graph().as_default() as g:
-        x = tf.placeholder(shape=[None, mnist_forward.INPUT_NODE], dtype=tf.float32)
-        y_= tf.placeholder(shape=[None, mnist_forward.OUTPUT_NODE], dtype=tf.float32)
+        x = tf.placeholder(tf.float32, [None, mnist_forward.INPUT_NODE])
+        y_= tf.placeholder(tf.float32, [None, mnist_forward.OUTPUT_NODE])
         y = mnist_forward.forward(x, None)
 
         ema = tf.train.ExponentialMovingAverage(mnist_backward.MOVING_AVERAGE_DECAY)
@@ -24,8 +24,8 @@ def test(mnist=None):
                 if ckpt and ckpt.model_checkpoint_path:
                     saver.restore(sess, ckpt.model_checkpoint_path)
                     global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
-                    accuracy_score = sess.run(accuracy,feed_dict={x:mnist.test.images, y_:mnist.test.labels})
-                    print("After {0} steps,accuracy:{1}".format(global_step, accuracy_score))
+                    accuracy_score = sess.run(accuracy, feed_dict={x:mnist.test.images, y_:mnist.test.labels})
+                    print("After %s steps,accuracy:%g" % (global_step, accuracy_score))
                 else:
                     print("No checkpoint file found!")
                     return

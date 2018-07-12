@@ -9,7 +9,7 @@ LEARNING_RATE_DECAY = 0.99
 REGULARIZER = 0.0001
 STEPS = 50000
 MOVING_AVERAGE_DECAY = 0.99
-MODEL_SAVE_PATH = "/model/"
+MODEL_SAVE_PATH = "./model/"
 MODEL_NAME =  "mnist_model"
 
 def backward(mnist=None):
@@ -30,6 +30,7 @@ def backward(mnist=None):
     ema_op = ema.apply(tf.trainable_variables())
     with tf.control_dependencies([train_step, ema_op]):
         train_op = tf.no_op(name='train')
+
     saver = tf.train.Saver()
 
     with tf.Session() as sess:
@@ -37,7 +38,7 @@ def backward(mnist=None):
         sess.run(init_op)
         for i in range(STEPS):
             xs, ys = mnist.train.next_batch(BATCH_SIZE)
-            _, loss_val, step =  sess.run([train_step, loss, global_step], feed_dict={x: xs, y_: ys})
+            _, loss_val, step =  sess.run([train_op, loss, global_step], feed_dict={x: xs, y_: ys})
             if i % 1000 == 0:
                 print("After {0} steps,loss{1}".format(step, loss_val))
                 saver.save(sess, os.path.join(MODEL_SAVE_PATH, MODEL_NAME), global_step=global_step)
