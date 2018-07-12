@@ -2,11 +2,19 @@
 import tensorflow as tf
 from PIL import Image
 import numpy as np
-
+import mnist_forward
+import mnist_backward
 
 
 def restore_model(picArray=None):
+    with tf.Graph().as_default() as tg:
+        x = tf.placeholder(tf.float32, [None, mnist_forward.INPUT_NODE])
+        y = mnist_forward(x, None)
+        preValue = tf.argmax(y, 1)
 
+        variable_averages = tf.train.ExponentialMovingAverage(mnist_backward.MOVING_AVERAGE_DECAY)
+        variable_to_restore = variable_averages.variables_to_restore()
+        saver = tf.train.Saver(variable_to_restore)
 
 def pre_pic(picName=None):
     img = Image.open(picName)
